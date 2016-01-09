@@ -18,6 +18,12 @@ DATA_MINING_INDEX = open(PATH_SOURCE_MINING_INDEX) do |io|
 	JSON.load(io)
 end
 
+#仮想支持率をまとめたもの
+PATH_JSON_INDEX_VIRTUAL_SIJI = "./source/index_virtual_siji.json"
+DATA_JSON_INDEX_VIRTUAL_SIJI = open(PATH_JSON_INDEX_VIRTUAL_SIJI) do |io|
+	JSON.load(io)
+end
+
 
 #targetで出力したものはshift_jisだから、utfにしておく
 def read_csv(file_path_csv)
@@ -30,7 +36,7 @@ end
 #CSVファイル１行分のデータ
 #これが複数集まったものが出馬表
 class Data_shussouma
-	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku
+	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku, :uma_virtual_sijiritu, :uma_odds
 	
 	#CSVを読み込み、１行ずつ渡される
 	#配列形式で渡されるはず
@@ -49,11 +55,20 @@ class Data_shussouma
 		@uma_taisen_rank	= record[10].to_i
 		@uma_raceid			= record[11]			#馬番有り＝全データでユニーク
 		@uma_raceid_no_num	= @uma_raceid[0..17]	#馬番抜き＝レースごとにユニーク
+		
+		#仮想オッズを求めるための支持率
+		#検索するために、小数点以下を切り捨てて、文字列にする
+		taisen_score = @uma_taisen_yosoku.to_i.to_s
+		@uma_virtual_sijiritu = DATA_JSON_INDEX_VIRTUAL_SIJI[taisen_score]
+	end
+	
+	def add_virtual_odds(odds)
+		@uma_odds = odds
 	end
 	
 	#てすと用
 	def test
-		p self
+		#p self
 		#p @uma_raceid
 		#p @uma_raceid_no_num
 	end
@@ -72,14 +87,42 @@ class Data_shutubahyo
 		end
 		
 		@taisen_rank = Taisen_rank.new(@shutubahyo)
+		
+		#出馬表が決まったら、仮想オッズも求めておく
+		add_virtual_odds
 	end
+	
+	#仮想オッズを求める
+	#対戦型マイニング予測のスコアごとに仮想支持率を求め、それをオッズに換算する
+	def add_virtual_odds
+		#支持の強さ合計を求めておく
+		total_siji = 0
+		@shutubahyo.each do |shussouma|
+			siji = shussouma.uma_virtual_sijiritu
+			total_siji += siji
+		end
+		
+		#支持率を求める
+		@shutubahyo.each do |shussouma|
+			siji = shussouma.uma_virtual_sijiritu
+			
+			total_hyosu = 10000	#仮の投票数。それ自体はいくつでも良い
+			rate = siji / total_siji
+			
+			#単勝オッズの計算式は、JRAにある通り
+			odds = ((total_hyosu * 0.8) / (total_hyosu * rate)).round(1)
+			
+			shussouma.add_virtual_odds(odds)
+		end
+	end
+	
+	
 	
 	def test
 		@shutubahyo.each do |shussouma|
-			p shussouma.uma_name
+			#p shussouma.instance_variables
+			p shussouma.uma_odds
 		end
-		
-		p @taisen_rank
 	end
 end
 
