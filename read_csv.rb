@@ -9,7 +9,6 @@ require "fileutils"
 require "CSV"
 require "json"
 
-PATH_SORCE_SHUTUBAHYO = "./source/sample_shutubahyo_20160108.csv"
 
 #targetで出力したものはshift_jisだから、utfにしておく
 def read_csv(file_path_csv)
@@ -147,14 +146,3 @@ class Kaisai
 		return @kaisai[raceid]
 	end
 end
-
-##################################################
-data_csv = read_csv(PATH_SORCE_SHUTUBAHYO)
-kaisai = Kaisai.new(data_csv)
-list_raceid = kaisai.list_raceid
-
-hoge = kaisai.get_shutubahyo("RX2016010906010201")
-hoge.shutubahyo.each do |fuga|
-	p fuga.uma_name, fuga.uma_raceid_no_num
-end
-
