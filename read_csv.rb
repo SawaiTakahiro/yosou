@@ -11,6 +11,14 @@ require "json"
 
 PATH_SORCE_SHUTUBAHYO = "./source/sample_shutubahyo_20160108.csv"
 
+#targetで出力したものはshift_jisだから、utfにしておく
+def read_csv(file_path_csv)
+	data_csv = CSV.read(file_path_csv, encoding: "Shift_JIS:UTF-8")
+	
+	return data_csv
+end
+
+##################################################
 #CSVファイル１行分のデータ
 #これが複数集まったものが出馬表
 class Data_shussouma
@@ -45,6 +53,8 @@ end
 
 #出馬表
 class Data_shutubahyo
+	attr_reader :shutubahyo
+	
 	def initialize(source)
 		@shutubahyo = Array.new
 		
@@ -52,6 +62,9 @@ class Data_shutubahyo
 			#レースIDの方は出走馬自体に含んでいるから足さない。
 			@shutubahyo << shussouma
 		end
+	end
+	
+	def get_shutubahyo
 	end
 	
 	def test
@@ -72,8 +85,9 @@ class Kaisai
 		
 		@kaisai = Hash.new
 		
-		id = "RX2016010906010212"
-		add_kaisai(id, @source)
+		@list_raceid.each do |id|
+			add_kaisai(id, @source)
+		end
 	end
 	
 	#その日に行われるレースidのリストを作る
@@ -116,10 +130,11 @@ class Kaisai
 	
 	#出馬表クラスを作って、開催に足していく
 	def add_kaisai(id, source)
-		#レースIDに対応した出走馬だけ抜き出して、
+		#レースIDに対応した出走馬だけ抜き出す
 		temp_source = get_temp_source(id, source)
-		fuga = Data_shutubahyo.new(temp_source).test
-		#fuga.test
+		shutubahyo = Data_shutubahyo.new(temp_source)
+		
+		@kaisai.store(id, shutubahyo)
 	end
 
 	def test
@@ -128,63 +143,18 @@ class Kaisai
 		end
 	end
 	
-end
-
-=begin
- メモ：覚書
- csvファイルを読み込む
- で、それを加工してあれこれしたい
- 
- なんか、読み込んだcsvファイル（Array）を開催クラスに投げると、
- その中でクラスとか作れそうな気がする
- 
- 頭の中を整理したほうがいいかも
-=end
-
-
-#targetで出力したものはshift_jisだから、utfにしておく
-def read_csv(file_path_csv)
-	data_csv = CSV.read(file_path_csv, encoding: "Shift_JIS:UTF-8")
-	
-	return data_csv
+	def get_shutubahyo(raceid)
+		return @kaisai[raceid]
+	end
 end
 
 ##################################################
-hoge = read_csv(PATH_SORCE_SHUTUBAHYO)
+data_csv = read_csv(PATH_SORCE_SHUTUBAHYO)
+kaisai = Kaisai.new(data_csv)
+list_raceid = kaisai.list_raceid
 
-kaisai = Kaisai.new(hoge)
-#puts kaisai.list_raceid
-
-
-=begin
-source = Array.new
-hoge.each do |data|
-	temp = Data_shussouma.new(data)
-	
-	#馬番なしレースIDをキーにした配列で入れておく
-	#レース単位で分けるため
-	source << [temp.uma_raceid_no_num, temp]
-	
+hoge = kaisai.get_shutubahyo("RX2016010906010201")
+hoge.shutubahyo.each do |fuga|
+	p fuga.uma_name, fuga.uma_raceid_no_num
 end
-=end
-=begin
-source.each do |raceid, shussouma|
-	p raceid + shussouma.uma_name
-end
-=end
-
-=begin
-id = "RX2016010908010211"	#テスト用
-hoge = source.select{|raceid, shussouma| raceid == id}
-
-fuga = Data_shutubahyo.new
-hoge.each do |raceid, shussouma|
-	#shussouma.test
-	#fuga.add_shussouma(shussouma)
-	p shussouma.instance_variables
-	break
-end
-
-#fuga.test
-=end
 
