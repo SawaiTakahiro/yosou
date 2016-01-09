@@ -9,6 +9,15 @@ require "fileutils"
 require "CSV"
 require "json"
 
+#読み込ませるファイル（仮）
+PATH_SOURCE_SHUTUBAHYO = "./source/sample_shutubahyo_20160108.csv"
+
+#対戦型のスコアと勝率の分布が入ったもの。ダミーデータが入っている
+PATH_SOURCE_MINING_INDEX = "./source/sample_taisen_mining_score.json"
+DATA_MINING_INDEX = open(PATH_SOURCE_MINING_INDEX) do |io|
+	JSON.load(io)
+end
+
 
 #targetで出力したものはshift_jisだから、utfにしておく
 def read_csv(file_path_csv)
@@ -21,7 +30,7 @@ end
 #CSVファイル１行分のデータ
 #これが複数集まったものが出馬表
 class Data_shussouma
-	attr_reader :uma_raceid_no_num, :uma_name
+	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku
 	
 	#CSVを読み込み、１行ずつ渡される
 	#配列形式で渡されるはず
@@ -61,15 +70,16 @@ class Data_shutubahyo
 			#レースIDの方は出走馬自体に含んでいるから足さない。
 			@shutubahyo << shussouma
 		end
-	end
-	
-	def get_shutubahyo
+		
+		@taisen_rank = Taisen_rank.new(@shutubahyo)
 	end
 	
 	def test
 		@shutubahyo.each do |shussouma|
 			p shussouma.uma_name
 		end
+		
+		p @taisen_rank
 	end
 end
 
@@ -145,4 +155,63 @@ class Kaisai
 	def get_shutubahyo(raceid)
 		return @kaisai[raceid]
 	end
+end
+
+
+
+=begin
+ 対戦ランクS〜Dのそれぞれ数（対戦型マイニング予測のスコアで分けている）
+ 実力馬の割合
+ 混戦度合い
+ を持たせる…のは今度
+=end
+class Taisen_rank
+	def initialize(shutubahyo)
+		list_taisen_score = get_list_taisen_score(shutubahyo)
+		
+		@count_rank_all = shutubahyo.length
+		
+		#ランクわけの基準値
+		#80より大だとSランク
+		kijun_a = 80
+		kijun_b = 70
+		kijun_c = 60
+		kijun_d = 50
+		
+		@count_rank_s = list_taisen_score.select{|score| score > kijun_a}.length
+		@count_rank_a = list_taisen_score.select{|score| score <= kijun_a &&  score > kijun_b}.length
+		@count_rank_b = list_taisen_score.select{|score| score <= kijun_b &&  score > kijun_c}.length
+		@count_rank_c = list_taisen_score.select{|score| score <= kijun_c &&  score > kijun_d}.length
+		@count_rank_d = list_taisen_score.select{|score| score <= kijun_d}.length
+		
+		#実力馬（Bランク以上の馬）の割合
+		jituryokuuma = @count_rank_s + @count_rank_a + @count_rank_b
+		@rate_jituryokuuma = jituryokuuma / @count_rank_all.to_f
+		
+		
+		
+		
+	end
+	
+	#扱いやすいように、対戦型のスコアだけ抜き出してまとめちゃう
+	def get_list_taisen_score(shutubahyo)
+		temp = Array.new
+		shutubahyo.each do |shussouma|
+			temp << shussouma.uma_taisen_yosoku
+		end
+		
+		return temp
+	end
+	
+	
+	def test
+		p @count_rank_all
+		p @count_rank_s
+		p @count_rank_a
+		p @count_rank_b
+		p @count_rank_c
+		p @count_rank_d
+	end
+	
+	
 end
