@@ -9,8 +9,6 @@ require "fileutils"
 require "CSV"
 require "json"
 
-#読み込ませるファイル（仮）
-PATH_SOURCE_SHUTUBAHYO = "./source/sample_shutubahyo_20160108.csv"
 
 #対戦型のスコアと勝率の分布が入ったもの。ダミーデータが入っている
 PATH_SOURCE_MINING_INDEX = "./source/sample_taisen_mining_score.json"

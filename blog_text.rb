@@ -331,15 +331,3 @@ class Text_race
 		puts @blog_text, "*"*30, @blog_ogp
 	end
 end
-
-
-############################################################
-data_csv = read_csv(PATH_SOURCE_SHUTUBAHYO)
-kaisai = Kaisai.new(data_csv)
-list_raceid = kaisai.list_raceid
-
-shutubahyo = kaisai.get_shutubahyo("RX2016010906010201")
-
-yosou = Yosou.new(shutubahyo)
-hoge = Text_race.new(shutubahyo, yosou)
-hoge.test
