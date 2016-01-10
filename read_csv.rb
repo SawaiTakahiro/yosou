@@ -209,6 +209,8 @@ end
  を持たせる…のは今度
 =end
 class Taisen_rank
+	attr_reader :count_rank_all, :count_rank_s, :count_rank_a, :count_rank_b, :count_rank_c, :count_rank_d
+	
 	def initialize(shutubahyo)
 		list_taisen_score = get_list_taisen_score(shutubahyo)
 		

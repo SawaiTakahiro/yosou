@@ -44,7 +44,9 @@ end
 #予想クラス
 #デフォルトで、適当な三連単を生成している
 #オーバーライドして適宜、予想の中身をつくれば良いはず？
+#出馬表クラスを受け取ってあれこれする
 class Yosou
+	attr_reader :raceid_no_num, :yosou_umaban, :deployment_umaban, :kaime
 	def initialize(data)
 		@raceid_no_num = get_raceid_no_num(data)
 		
@@ -171,16 +173,3 @@ class Yosou
 		p self
 	end
 end
-
-
-##################################################
-
-data_csv = read_csv(PATH_SOURCE_SHUTUBAHYO)
-kaisai = Kaisai.new(data_csv)
-list_raceid = kaisai.list_raceid
-
-testdata = kaisai.get_shutubahyo("RX2016010906010201")
-shutubahyo = testdata.shutubahyo
-
-hoge = Yosou.new(testdata)
-hoge.test
