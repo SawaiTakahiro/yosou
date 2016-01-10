@@ -36,7 +36,7 @@ end
 #CSVファイル１行分のデータ
 #これが複数集まったものが出馬表
 class Data_shussouma
-	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku, :uma_virtual_sijiritu, :uma_odds, :uma_umaban, :uma_taisen_rank
+	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku, :uma_virtual_sijiritu, :uma_odds, :uma_umaban, :uma_taisen_rank, :uma_basho, :uma_race_num
 	
 	#CSVを読み込み、１行ずつ渡される
 	#配列形式で渡されるはず
