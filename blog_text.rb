@@ -13,6 +13,54 @@ require "json"
 require "./read_csv.rb"
 require "./yosou.rb"
 
+
+#レースごとのテキストを格納する
+#1〜12レースまでのテキスト
+#メインレースの予想を使ったタグ、記事の概要なんかも持たせる。
+#これ自体がブログの記事１つぶんって感じ
+class Text_basho
+	attr_reader :list_text_race
+	
+	def initialize
+		@list_text_race = Array.new
+		@text_title = "hoge"
+		@text_ogp = "hoge"
+	end
+	
+	def add_text_race(text_race)
+		@list_text_race << text_race.blog_text
+	end
+	
+	#タイトルは、出馬表からあれこれして生成する
+	#場所、日付が必要。日付はレースIDを加工して取り出す
+	def add_text_title(shutubahyo)
+		#適当な馬を選ぶ。場所とかは同じレースなら共通なので
+		shussouma		= shutubahyo.shutubahyo[0]
+		raceid_no_num	= shussouma.uma_raceid_no_num
+		basho			= shussouma.uma_basho
+		
+		year	= raceid_no_num[2..5]
+		month	= raceid_no_num[6..7]
+		day		= raceid_no_num[8..9]
+		
+		#「2016/01/11京都の対戦型データマイニング予測ピックアップ」とかって形
+		@text_title = year + "/" + month + "/" + day + basho + "の対戦型データマイニング予測ピックアップ"
+	end
+	
+	#ブログの概要を作る
+	#どのレースで概要を作るべきか？は別のところで判断する
+	#この中では呼ばれたら足す（上書きする）だけ
+	def add_text_ogp(text_race)
+		@text_ogp = text_race.blog_ogp
+	end
+	
+	def test
+		puts @text_title
+		#puts @list_text_race
+		puts @text_ogp
+	end
+end
+
 =begin
  メモ：
  ブログの本文っていうクラスがあってもよさそう。
@@ -21,9 +69,9 @@ require "./yosou.rb"
  
  まずは、レース単位で処理する部分を作る
 =end
-
 #予想と同じく、出馬表クラスを使ってあれこれする
 class Text_race
+	attr_reader :blog_text, :blog_ogp
 	def initialize(shutubahyo, yosou)
 		@shutubahyo			= shutubahyo.shutubahyo	#出馬表クラスの出馬表
 		@taisen_rank		= shutubahyo.taisen_rank
