@@ -127,11 +127,12 @@ end
 #今日のレースまとめ。１日単位だけど開催ってしておく
 #出馬表をまとめたもの
 class Kaisai
-	attr_reader :list_raceid
+	attr_reader :list_raceid, :list_basho
 	
 	def initialize(data_csv)
 		@source = to_source(data_csv)
 		@list_raceid = get_list_raceid(@source)
+		@list_basho = get_list_basho(@source)
 		
 		@kaisai = Hash.new
 		
@@ -145,6 +146,17 @@ class Kaisai
 		temp = Array.new
 		source.each do |id, shussouma|
 			temp << shussouma.uma_raceid_no_num
+		end
+		
+		return temp.uniq
+	end
+	
+	#いくつのコースで開催されてるかリスト。
+	def get_list_basho(source)
+		temp = Array.new
+		source.each do |id, shussouma|
+			id = shussouma.uma_raceid_no_num
+			temp << id[0..11]
 		end
 		
 		return temp.uniq

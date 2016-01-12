@@ -46,14 +46,22 @@ end
 #オーバーライドして適宜、予想の中身をつくれば良いはず？
 #出馬表クラスを受け取ってあれこれする
 class Yosou
-	attr_reader :raceid_no_num, :yosou_umaban, :deployment_umaban, :kaime
+	attr_reader :raceid_no_num, :yosou_umaban, :deployment_umaban, :kaime, :error
 	def initialize(data)
+		@error = false	#無効なデータか否か。true : ダメなデータ、false : 問題ないデータ
+		
+		#もし、対戦型予測が提供されていなそうなら、そこで終了する
+		taisen_yosoku = data.shutubahyo[0].uma_taisen_yosoku
+		if taisen_yosoku == 0 then
+			@error = true	#データ的にはエラーとしておく
+			return
+		end
+		
 		@raceid_no_num = get_raceid_no_num(data)
 		
 		#予想、買い目の展開の仕方はそれ用のメソッドで
 		#yosouの中を書き換えるだけで良いはず
 		yosou(data)
-		
 	end
 	
 	def get_raceid_no_num(data)
@@ -89,12 +97,21 @@ class Yosou
 		
 		#対戦型マイニング順の馬番リストを用意する
 		#買い目の生成は、それによるところが多いので。
-		list_taisen_rank = Array.new
+		temp_umaban = Array.new
 		shutubahyo.each do |shussouma|
 			uma_umaban = shussouma.uma_umaban
 			uma_taisen_rank = shussouma.uma_taisen_rank
 			
-			list_taisen_rank[uma_taisen_rank - 1] = uma_umaban
+			#この作り方だと、同じ順位があったときnilな値が出てきてエラーになる
+			#list_taisen_rank[uma_taisen_rank - 1] = uma_umaban
+			
+			temp_umaban << [uma_taisen_rank, uma_umaban]
+		end
+		
+		#面倒かもしれないけど、対戦型、馬番だけ抜き出したリストを作って、それをソートして、馬番だけ取り出す
+		list_taisen_rank = Array.new
+		temp_umaban.sort.each do |rank, umaban|
+			list_taisen_rank << umaban
 		end
 		
 		umaban_honmei = list_taisen_rank[0]

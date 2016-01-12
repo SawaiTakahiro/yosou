@@ -23,8 +23,8 @@ class Text_basho
 	
 	def initialize
 		@list_text_race = Array.new
-		@text_title = "hoge"
-		@text_ogp = "hoge"
+		@text_title = "ダミー。タイトルテキスト"
+		@text_ogp = "ダミー。概要テキスト"
 	end
 	
 	def add_text_race(text_race)
@@ -73,6 +73,13 @@ end
 class Text_race
 	attr_reader :blog_text, :blog_ogp
 	def initialize(shutubahyo, yosou)
+		#エラーデータだった場合は中止
+		#というか、そもそもこのクラスを作らないようにしておくほうが良い？
+		if yosou.error == true then
+			return
+		end
+		
+		
 		@shutubahyo			= shutubahyo.shutubahyo	#出馬表クラスの出馬表
 		@taisen_rank		= shutubahyo.taisen_rank
 		
