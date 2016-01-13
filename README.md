@@ -26,3 +26,5 @@
 ## エラーが入っていた場合どうにかする
 - http://www.minituku.net/courses/566428009/lessons/760432481/texts/302758961?locale=ja
 - これとか？
+
+てすと
