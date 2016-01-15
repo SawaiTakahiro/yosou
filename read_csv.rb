@@ -34,7 +34,7 @@ end
 #CSVファイル１行分のデータ
 #これが複数集まったものが出馬表
 class Data_shussouma
-	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku, :uma_virtual_sijiritu, :uma_odds, :uma_umaban, :uma_taisen_rank, :uma_basho, :uma_race_num
+	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku, :uma_virtual_sijiritu, :uma_odds, :uma_umaban, :uma_taisen_rank, :uma_basho, :uma_race_num, :uma_class
 	
 	#CSVを読み込み、１行ずつ渡される
 	#配列形式で渡されるはず
@@ -73,8 +73,9 @@ class Data_shussouma
 end
 
 #出馬表
+#１レース分をまとめたもの。それがメインレースか？のフラグも持つ
 class Data_shutubahyo
-	attr_reader :shutubahyo, :taisen_rank
+	attr_reader :shutubahyo, :taisen_rank, :flag_main
 	
 	def initialize(source)
 		@shutubahyo = Array.new
@@ -85,6 +86,7 @@ class Data_shutubahyo
 		end
 		
 		@taisen_rank = Taisen_rank.new(@shutubahyo)
+		@flag_main = check_main_race(@shutubahyo)	#メインレースならtrue、違えばfalse
 		
 		#出馬表が決まったら、仮想オッズも求めておく
 		add_virtual_odds
@@ -114,6 +116,30 @@ class Data_shutubahyo
 		end
 	end
 	
+	#メインレースなのかの判定
+	def check_main_race(shutubahyo)
+		uma_class = shutubahyo[0].uma_class
+		race_num = shutubahyo[0].uma_race_num
+		
+		#ダービー、ジャパンカップ、有馬記念か判定
+		#10レース以降でGIだったら、たぶん上記３レースのどれか。
+		#9レース＋G1だと障害レースの場合がある。最終から〜個前はダービーだと当てはまらないかも…なので。
+		if uma_class == "G1" && race_num >= 10 then
+			#p "ダービーなどの特殊なGIメインレース"
+			return true
+		end
+		
+		#そうでない場合は11レースがメインレースなので
+		if race_num == 11 then
+			#p "通常メインレース"
+			return true
+		end
+		
+		
+		#メインレースでないレースは
+		#p "通常レース"
+		return false
+	end
 	
 	
 	def test

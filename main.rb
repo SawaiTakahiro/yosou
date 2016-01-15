@@ -24,6 +24,7 @@ kaisai = Kaisai.new(data_csv)
 
 #場所ごとにテキストを保存するためのハッシュを用意する
 #場所idごとにText_basho（１つの記事にするためのかたまり）を作る。
+#ハッシュの中身がtext_bashoクラス！
 blog_text = Hash.new
 kaisai.list_basho.each do |basho_id|
 	blog_text[basho_id] = Text_basho.new
@@ -45,12 +46,19 @@ list_raceid.each do |raceid|
 		#場所idのオブジェクト？ごとにテキストを振り分ける
 		basho_id = raceid[0..11]
 		blog_text[basho_id].add_text_race(text_race)
+		
+		#メインレースなら概要を足す
+		#ついでにブログタイトルも
+		flag_main = shutubahyo.flag_main
+		if flag_main == true then
+			blog_text[basho_id].add_text_ogp(text_race)
+			blog_text[basho_id].add_text_title(shutubahyo)
+		end
+		
 	end
-	
 end
-
 
 #テスト用。開催ID
 #RX2016010906
 #RX2016010908
-puts blog_text["RX2016010906"].list_text_race
+#puts blog_text["RX2016010906"].list_text_race
