@@ -30,3 +30,11 @@ def read_csv(file_path_csv)
 	
 	return data_csv
 end
+
+#ブログ村のトラックバック先。
+#たぶんここでしか使わないので、この中に
+TRACKBACKLIST = <<URL
+http://horserace.blogmura.com/rpc/trackback/76822/swm4mb2smes5
+http://horserace.blogmura.com/rpc/trackback/74447/swm4mb2smes5
+http://horserace.blogmura.com/rpc/trackback/76272/swm4mb2smes5
+URL
