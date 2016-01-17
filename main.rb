@@ -42,6 +42,12 @@ end
 
 #厳選馬のテキストを作る
 gensen_uma = Gensen_uma.new(data_csv)
-text = to_text_gensen_uma(gensen_uma.pickup_list_score)	#対戦型スコア準拠
-text = to_text_gensen_uma(gensen_uma.pickup_list_okaidoku)	#オッズが狙い目な馬
-
+blog_gensen_uma = Array.new
+blog_gensen_uma << gensen_uma.text_title
+blog_gensen_uma << "■対戦型予測スコアでの厳選馬"
+blog_gensen_uma << to_text_gensen_uma(gensen_uma.pickup_list_score)	#対戦型スコア準拠
+blog_gensen_uma << ""
+blog_gensen_uma << "■狙い目の馬"
+blog_gensen_uma << to_text_gensen_uma(gensen_uma.pickup_list_okaidoku)	#オッズが狙い目な馬
+puts blog_gensen_uma
+puts TRACKBACKLIST
