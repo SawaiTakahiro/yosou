@@ -34,7 +34,7 @@ end
 #CSVファイル１行分のデータ
 #これが複数集まったものが出馬表
 class Data_shussouma
-	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku, :uma_virtual_sijiritu, :uma_odds, :uma_umaban, :uma_taisen_rank, :uma_basho, :uma_race_num, :uma_text_umamei
+	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku, :uma_virtual_sijiritu, :uma_odds, :uma_umaban, :uma_taisen_rank, :uma_basho, :uma_race_num, :uma_text_umamei, :uma_odds, :uma_raceid
 	
 	#CSVを読み込み、１行ずつ渡される
 	#配列形式で渡されるはず
@@ -209,7 +209,19 @@ class Kaisai
 		
 		@kaisai.store(id, shutubahyo)
 	end
-
+	
+	#厳選馬用に出走馬一覧を取り出す
+	#場所とか関係なく、レース分を全部一覧にする
+	def get_list_shussouma
+		temp = Array.new
+		
+		@source.each do |id, shussouma|
+			temp << shussouma
+		end
+		
+		return temp
+	end
+	
 	def test
 		@source.each do |id, shussouma|
 			p shussouma.uma_raceid_no_num
