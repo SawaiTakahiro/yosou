@@ -386,3 +386,70 @@ class Text_race
 		puts @blog_text, "*"*30, @blog_ogp
 	end
 end
+
+
+#通常予想のテキストを得る処理
+def get_blog_text(kaisai)
+	#場所ごとにテキストを保存するためのハッシュを用意する
+	#場所idごとにText_basho（１つの記事にするためのかたまり）を作る。
+	blog_text = Hash.new
+	kaisai.list_basho.each do |basho_id|
+		blog_text[basho_id] = Text_basho.new
+	end
+	
+	#開催に含まれるレースID分だけ繰り返す
+	list_raceid = kaisai.list_raceid
+	list_raceid.each do |raceid|
+		shutubahyo = kaisai.get_shutubahyo(raceid)
+		
+		yosou = Yosou.new(shutubahyo)
+		
+		#予想がエラーじゃなければ、テキストに加える
+		#エラーだった場合はスキップしちゃう
+		if yosou.error == false then
+			text_race = Text_race.new(shutubahyo, yosou)
+			
+			#レースIDの前12桁が場所idにあたる
+			#場所idのオブジェクト？ごとにテキストを振り分ける
+			basho_id = raceid[0..11]
+			blog_text[basho_id].add_text_race(text_race)
+		end
+	end
+	
+	return blog_text
+end
+
+#厳選馬を
+#shussoumaが入った配列を使って、それを記事用のテキストにして返す
+#表みたいな形の方が見やすそうだったので、簡単なテーブル組に
+def to_text_gensen_uma(list_uma)
+	#puts list_uma[0i].instance_variables
+	
+	text = Array.new
+	list_uma.each do |shussouma|
+		basho		= shussouma.uma_basho
+		race_num	= shussouma.uma_race_num
+		name		= shussouma.uma_text_umamei.join
+		
+		#勝率とかも入れる
+		taisen_yosoku = shussouma.uma_taisen_yosoku
+		seiseki		= DATA_MINING_INDEX[taisen_yosoku.to_i.to_s]
+		shoritsu	= format("%d.0%", seiseki["shoritsu"] * 100)
+		rentai		= format("%d.0%", seiseki["rentai"] * 100)
+		fukusho		= format("%d.0%", seiseki["fukusho"] * 100)
+		
+		#print basho, race_num,"R ", name, " ",shoritsu," ",rentai," ",fukusho,"\n"
+		#temp_text = basho + format("%02d", race_num) + "R " + name + " 勝率：" + shoritsu + " 複勝率：" + rentai + " 連対率：" + fukusho,"\n"
+		temp_text = "<tr><td>" + basho + format("%02d", race_num) + "R</td><td>" + name + "</td><td>" + shoritsu + "</td><td>" + rentai + "</td><td>" + fukusho,"</td></tr>\n"
+		
+		text << temp_text
+	end
+	
+	#とりあえず、出走馬の名前は200pxで固定に。文字数的には足りるはず
+	header = '<table border="1"><tr><th>レース</th><th width="200px">名前</th><th>勝率</th><th>連対率</th><th>複勝率</th></tr>'
+	footer = '</table>'
+	return header + text.join + footer
+end
+
+
+
