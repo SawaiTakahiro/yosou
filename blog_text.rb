@@ -21,7 +21,7 @@ require "./yosou.rb"
 #メインレースの予想を使ったタグ、記事の概要なんかも持たせる。
 #これ自体がブログの記事１つぶんって感じ
 class Text_basho
-	attr_reader :list_text_race, :text_title, :text_ogp
+	attr_reader :list_text_race, :text_title, :text_ogp, :name_honmei
 	
 	def initialize
 		@list_text_race = Array.new
@@ -55,6 +55,9 @@ class Text_basho
 	def add_text_ogp(text_race)
 		@text_ogp = text_race.blog_ogp
 	end
+	def add_text_honmei(text_race)
+		@name_honmei = text_race.name_honmei
+	end
 	
 	def test
 		puts @text_title
@@ -73,7 +76,7 @@ end
 =end
 #予想と同じく、出馬表クラスを使ってあれこれする
 class Text_race
-	attr_reader :blog_text, :blog_ogp
+	attr_reader :blog_text, :blog_ogp, :name_honmei
 	def initialize(shutubahyo, yosou)
 		#エラーデータだった場合は中止
 		#というか、そもそもこのクラスを作らないようにしておくほうが良い？
@@ -102,6 +105,8 @@ class Text_race
 		@blog_text << get_text_kaime_sanrentan_2m(@yosou_umaban).join("\n")
 		
 		@blog_ogp = get_text_OGP(@shutubahyo, @yosou_umaban).join("\n")
+		
+		@name_honmei = get_name_honmei(@yosou_umaban, @shutubahyo)
 	end
 	
 	#馬番と馬名を返す
@@ -345,6 +350,12 @@ class Text_race
 		return text
 	end
 	
+	#本命とか表示する部分
+	def get_name_honmei(yosou_umaban, shutubahyo)
+		name_honmei = shutubahyo[yosou_umaban.jiku_a - 1].uma_name
+		return name_honmei
+	end
+	
 	def get_name_race(shutubahyo)
 		temp_uma = shutubahyo[0]	#適当な馬を抜き出す
 		name_race = temp_uma.uma_basho + format("%02d",temp_uma.uma_race_num) + "R"	#中山1Rとかそんな形
@@ -422,6 +433,7 @@ def get_blog_text(kaisai)
 			if flag_main == true then
 				blog_text[basho_id].add_text_ogp(text_race)
 				blog_text[basho_id].add_text_title(shutubahyo)
+				blog_text[basho_id].add_text_honmei(text_race)	#本命も足す
 			end
 		end
 	end

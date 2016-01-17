@@ -29,8 +29,10 @@ blog_text = get_blog_text(kaisai)
 blog_text.each do |key, value|
 	p "*" * 30
 	puts value.text_title
-	puts value.list_text_race
+	#puts value.list_text_race
+	puts value.name_honmei
 	puts value.text_ogp
+	puts TRACKBACKLIST
 end
 
 #テスト用。開催ID
