@@ -12,30 +12,97 @@ require "json"
 
 require "./read_csv.rb"
 
-#出馬表データから、対戦型予測が50以上の馬だけ抜き出して返す
-#対戦型で50以下はまず用無しなので削っちゃう
-#やっぱり、どこで切るか？は引数でもてる方にした方がよさそう
-def ashikiri(data_csv, rate)
-	pickup = data_csv.select do |record|
-		race_num = record[9].to_i
-		race_num >= rate
+#厳選馬。それ自体をクラスに
+class Gensen_uma
+	attr_reader :pickup_list_score, :pickup_list_okaidoku
+	
+	def initialize(data_csv)
+		#それぞれの条件でピックアップしていく
+		@pickup_list_score		= pickup_score(data_csv)
+		@pickup_list_okaidoku	= pickup_okaidoku(data_csv)
 	end
 	
-	return pickup
+	#仮想複勝オッズを求めるメソッド
+	#仮想の単勝オッズ / 2して、それの平方根を求めるとそれっぽい気がする？
+	#１レコード分だけ処理して返す。必要になったらその都度呼ぶ感じ
+	def get_virtual_odds_fukusho(odds)
+		return Math.sqrt(odds / 2)
+	end
+	
+	#出馬表データから、対戦型予測が50以上の馬だけ抜き出して返す
+	#対戦型で50以下はまず用無しなので削っちゃう
+	#やっぱり、どこで切るか？は引数でもてる方にした方がよさそう
+	def ashikiri(data_csv, rate)
+		pickup = data_csv.select do |record|
+			race_num = record[9].to_i
+			race_num >= rate
+		end
+		
+		return pickup
+	end
+	
+	#対戦型スコアが上位の馬だけを抜き出して返す
+	def pickup_score(data_csv)
+		#スコアが80以上のものだけピックアップ
+		pickup = ashikiri(data_csv, 80)
+		
+		max = pickup.length
+		#たくさんいた場合は上位5頭までにまとめる
+		if max > 5 then
+			max = 5
+		end
+		
+		
+		#対戦型のスコア順に並べる
+		sort_pickup = pickup.sort{|a, b| b[9].to_i <=> a[9].to_i}
+		
+		temp = Array.new
+		sort_pickup[0..max].each do |record|
+			temp << Data_shussouma.new(record)
+		end
+		
+		return temp
+	end
+	
+	#オッズがお買い得な馬をピックアップ
+	def pickup_okaidoku(data_csv)
+		#１回、開催データを作ってから加工し直す
+		kaisai = Kaisai.new(data_csv)
+		#puts kaisai.instance_variables
+		
+		list_shussouma = kaisai.get_list_shussouma	#その日に出る馬の一覧
+		
+		#条件に合う馬だけ抜き出して出力する
+		temp = Array.new
+		list_shussouma.each do |shussouma|
+			#対戦予測が50未満なら飛ばす
+			taisen_yosoku = shussouma.uma_taisen_yosoku
+			next if taisen_yosoku < 50
+			
+			#複勝率はあるていど欲しい
+			#参照先のキーが整数でしかも文字列だからごにょごにょしてる
+			fukusho = DATA_MINING_INDEX[taisen_yosoku.to_i.to_s]["fukusho"]
+			next if fukusho < 0.5
+			
+			#仮想複勝オッズを求めて判断。求め方は適当だけど…
+			#仮想複勝オッズ自体は記事に盛り込まないので、ここだけで使う
+			virtual_odds_fukusho = get_virtual_odds_fukusho(shussouma.uma_odds)
+			next if virtual_odds_fukusho < 1.5
+			
+			#残ったものだけリストに追加
+			temp << shussouma
+		end
+		
+		return temp
+	end
 end
+
 
 ############################################################
 #読み込ませるファイル（仮）
 PATH_SOURCE_SHUTUBAHYO = "./source/sample_shutubahyo_20160108.csv"
 data_csv = read_csv(PATH_SOURCE_SHUTUBAHYO)
 
-pickup = ashikiri(data_csv, 80)
+hoge = Gensen_uma.new(data_csv)
 
-#スコア順に並べたものを別途用意する
-temp = pickup.sort{|a, b| b[9].to_i <=> a[9].to_i}
-
-temp[0, 5].each do |hoge|
-	piyo = Data_shussouma.new(hoge)
-	p piyo.uma_text_umamei
-	p piyo.uma_taisen_yosoku
-end
+puts hoge.pickup_list_score
