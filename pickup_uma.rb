@@ -13,13 +13,32 @@ require "json"
 require "./read_csv.rb"
 
 #厳選馬。それ自体をクラスに
+#いろいんな条件で抽出したshussoumaクラスの配列を持っている
+#配列の種類はいろいろ増やしてみる
 class Gensen_uma
-	attr_reader :pickup_list_score, :pickup_list_okaidoku
+	attr_reader :pickup_list_score, :pickup_list_okaidoku, :text_title
 	
 	def initialize(data_csv)
+		@text_title 			= get_date(data_csv)
+		
 		#それぞれの条件でピックアップしていく
 		@pickup_list_score		= pickup_score(data_csv)
 		@pickup_list_okaidoku	= pickup_okaidoku(data_csv)
+	end
+	
+	#日付の取得をする
+	#ブログの記事に使うだけなので、日付自体は文字列。
+	def get_date(data_csv)
+		#作業用に適当なデータで出走馬を作る
+		temp_shussouma	= Data_shussouma.new(data_csv[0])
+		raceid_no_num	= temp_shussouma.uma_raceid_no_num
+		
+		year	= raceid_no_num[2..5]
+		month	= raceid_no_num[6..7]
+		day		= raceid_no_num[8..9]
+		
+		#「2016/01/11京都の対戦型データマイニング予測ピックアップ」とかって形
+		return year + "/" + month + "/" + day + "の厳選馬"
 	end
 	
 	#仮想複勝オッズを求めるメソッド
@@ -96,13 +115,3 @@ class Gensen_uma
 		return temp
 	end
 end
-
-
-############################################################
-#読み込ませるファイル（仮）
-PATH_SOURCE_SHUTUBAHYO = "./source/sample_shutubahyo_20160108.csv"
-data_csv = read_csv(PATH_SOURCE_SHUTUBAHYO)
-
-hoge = Gensen_uma.new(data_csv)
-
-puts hoge.pickup_list_score
