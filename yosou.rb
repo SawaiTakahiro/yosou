@@ -6,7 +6,7 @@
  
  予想自体をクラスにした。
  出馬表クラスを渡されると、予想して買い目を作ったりする。
-=end
+ =end
 
 require "fileutils"
 require "CSV"
@@ -43,11 +43,11 @@ class List_yosou_umaban
 	
 end
 
-#予想クラス
+#予想クラスのテンプレート
 #デフォルトで、適当な三連単を生成している
 #オーバーライドして適宜、予想の中身をつくれば良いはず？
 #出馬表クラスを受け取ってあれこれする
-class Yosou
+class Yosou_template
 	attr_reader :raceid_no_num, :yosou_umaban, :deployment_umaban, :kaime, :error
 	def initialize(data)
 		@error = false	#無効なデータか否か。true : ダメなデータ、false : 問題ないデータ
@@ -191,4 +191,12 @@ class Yosou
 	def test
 		p self
 	end
+end
+
+
+#予想クラス
+#いろいろ書き換えるのがめんどうなので。必要に応じて、このクラスに上書きする感じ
+#とりあえず、テンプレートの予想クラスでオーバーライドしておく。
+#予想の生成自体はblog_textで行っている。mainのほうでは記事しか見えない
+class Yosou < Yosou_template
 end
