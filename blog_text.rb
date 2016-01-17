@@ -10,6 +10,8 @@ require "fileutils"
 require "CSV"
 require "json"
 
+require "./config.rb"
+
 require "./read_csv.rb"
 require "./yosou.rb"
 
@@ -19,7 +21,7 @@ require "./yosou.rb"
 #メインレースの予想を使ったタグ、記事の概要なんかも持たせる。
 #これ自体がブログの記事１つぶんって感じ
 class Text_basho
-	attr_reader :list_text_race
+	attr_reader :list_text_race, :text_title, :text_ogp
 	
 	def initialize
 		@list_text_race = Array.new

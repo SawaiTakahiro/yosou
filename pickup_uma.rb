@@ -10,6 +10,8 @@ require "fileutils"
 require "CSV"
 require "json"
 
+require "./config.rb"
+
 require "./read_csv.rb"
 
 #厳選馬。それ自体をクラスに

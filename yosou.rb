@@ -12,6 +12,8 @@ require "fileutils"
 require "CSV"
 require "json"
 
+require "./config.rb"
+
 require "./read_csv.rb"
 
 #馬券の種類。targetの買い目データ準拠
