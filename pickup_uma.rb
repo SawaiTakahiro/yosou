@@ -80,7 +80,7 @@ class Gensen_uma
 			temp << Data_shussouma.new(record)
 		end
 		
-		return temp
+		return sort_list_shussouma(temp)
 	end
 	
 	#オッズがお買い得な馬をピックアップ
@@ -112,6 +112,22 @@ class Gensen_uma
 			temp << shussouma
 		end
 		
-		return temp
+		return sort_list_shussouma(temp)
+	end
+	
+	#出走馬が入ったリストを、レースID順に並べて返す
+	#そのままだとソートができないので
+	def sort_list_shussouma(list_shussouma)
+		temp = Array.new
+		list_shussouma.each do |shussouma|
+			temp << [shussouma.uma_raceid, shussouma]
+		end
+		
+		output = Array.new
+		temp.sort.each do |raceid, shussouma|
+			output << shussouma
+		end
+	
+		return output
 	end
 end
