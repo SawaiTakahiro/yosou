@@ -36,32 +36,44 @@ data_csv = read_csv(PATH_SOURCE_SHUTUBAHYO)
 #読み込んだデータを、扱いやすい形に変換
 kaisai = Kaisai.new(data_csv)
 
+kaisai.list_basho
+
 #=begin
 #通常予想のテキスト Text_basho形式
 #コースごとに繰り返す
 blog_text = get_blog_text(kaisai)
-blog_text.each do |key, value|
-	p "記事のタイトル"
-	copy_paste_support(value.text_title)
+kaisai.list_basho.each do |key|
+	text_zenhan = blog_text[key + "01"]
+	text_kouhan = blog_text[key + "02"]
 	
-	p "ブログの本文"
-	copy_paste_support(value.list_text_race.join)
+	#テキスト、タグ、記事の概要は後半の方に入っている
+	p key
+	p "記事のタイトル"
+	copy_paste_support(text_kouhan.text_title)
+	
+	p "ブログの本文（前半）"
+	copy_paste_support(text_zenhan.list_text_race.join)
+	
+	p "ブログの本文（後半）"
+	copy_paste_support(text_kouhan.list_text_race.join)
 	
 	p "タグ"
-	copy_paste_support(value.name_honmei)
+	copy_paste_support(text_kouhan.name_honmei)
 	
 	p "記事の概要"
-	copy_paste_support(value.text_ogp)
+	copy_paste_support(text_kouhan.text_ogp)
 	
 	p "トラックバックの送信先"
 	copy_paste_support(TRACKBACKLIST)
 end
 #=end
 
+#=begin
 #厳選馬のテキストを作る
 gensen_uma = Gensen_uma.new(data_csv)
 blog_gensen_uma = gensen_uma.blog_gensen_uma
 
+p "厳選馬の記事"
 p "記事のタイトル"
 copy_paste_support(gensen_uma.text_title)
 
@@ -70,3 +82,4 @@ copy_paste_support(blog_gensen_uma.join)
 
 p "トラックバックの送信先"
 copy_paste_support(TRACKBACKLIST)
+#=end

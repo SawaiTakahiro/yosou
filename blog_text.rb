@@ -407,7 +407,13 @@ def get_blog_text(kaisai)
 	#場所idごとにText_basho（１つの記事にするためのかたまり）を作る。
 	blog_text = Hash.new
 	kaisai.list_basho.each do |basho_id|
-		blog_text[basho_id] = Text_basho.new
+		#前半、後半を分ける。前半01、後半02
+		#場合によってはもっと細かく分けたほうがいいかも？　長いもんな
+		key = basho_id + "01"
+		blog_text[key] = Text_basho.new
+		
+		key = basho_id + "02"
+		blog_text[key] = Text_basho.new
 	end
 	
 	#開催に含まれるレースID分だけ繰り返す
@@ -425,15 +431,25 @@ def get_blog_text(kaisai)
 			#レースIDの前12桁が場所idにあたる
 			#場所idのオブジェクト？ごとにテキストを振り分ける
 			basho_id = raceid[0..11]
-			blog_text[basho_id].add_text_race(text_race)
+			
+			#あと、前半後半でも振り分ける
+			race_num = shutubahyo.shutubahyo[0].uma_race_num
+			flag_half = "01"	#前半をデフォルト値
+			
+			#６レースより後、７レースからが後半
+			if race_num > 6 then
+				flag_half = "02"
+			end
+			
+			blog_text[basho_id + flag_half].add_text_race(text_race)
 			
 			#メインレースなら概要を足す
 			#ついでにブログタイトルも
 			flag_main = shutubahyo.flag_main
 			if flag_main == true then
-				blog_text[basho_id].add_text_ogp(text_race)
-				blog_text[basho_id].add_text_title(shutubahyo)
-				blog_text[basho_id].add_text_honmei(text_race)	#本命も足す
+				blog_text[basho_id + flag_half].add_text_ogp(text_race)
+				blog_text[basho_id + flag_half].add_text_title(shutubahyo)
+				blog_text[basho_id + flag_half].add_text_honmei(text_race)	#本命も足す
 			end
 		end
 	end
