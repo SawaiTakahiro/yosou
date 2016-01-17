@@ -350,7 +350,7 @@ class Text_race
 		return text
 	end
 	
-	#本命とか表示する部分
+	#本命馬の名前取る
 	def get_name_honmei(yosou_umaban, shutubahyo)
 		name_honmei = shutubahyo[yosou_umaban.jiku_a - 1].uma_name
 		return name_honmei
