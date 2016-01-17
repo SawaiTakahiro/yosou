@@ -34,7 +34,7 @@ end
 #CSVファイル１行分のデータ
 #これが複数集まったものが出馬表
 class Data_shussouma
-	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku, :uma_virtual_sijiritu, :uma_odds, :uma_umaban, :uma_taisen_rank, :uma_basho, :uma_race_num, :uma_class
+	attr_reader :uma_raceid_no_num, :uma_name, :uma_taisen_yosoku, :uma_virtual_sijiritu, :uma_odds, :uma_umaban, :uma_taisen_rank, :uma_basho, :uma_race_num, :uma_class, :uma_text_umamei, :uma_odds, :uma_raceid
 	
 	#CSVを読み込み、１行ずつ渡される
 	#配列形式で渡されるはず
@@ -53,6 +53,7 @@ class Data_shussouma
 		@uma_taisen_rank	= record[10].to_i
 		@uma_raceid			= record[11]			#馬番有り＝全データでユニーク
 		@uma_raceid_no_num	= @uma_raceid[0..17]	#馬番抜き＝レースごとにユニーク
+		@uma_text_umamei	= add_text_umamei(@uma_umaban, @uma_name)	#ほぼ出力用馬名
 		
 		#仮想オッズを求めるための支持率
 		#検索するために、小数点以下を切り捨てて、文字列にする
@@ -62,6 +63,16 @@ class Data_shussouma
 	
 	def add_virtual_odds(odds)
 		@uma_odds = odds
+	end
+	
+	#馬番と馬名を返す
+	#ブログの記事用ににたようなメソッド作ったけど、そもそも出走馬で持った方が便利だった
+	def add_text_umamei(umaban, uma_name)
+		text = Array.new
+		
+		text << format("%02d",umaban) + "番" + uma_name
+		
+		return text
 	end
 	
 	#てすと用
@@ -224,7 +235,19 @@ class Kaisai
 		
 		@kaisai.store(id, shutubahyo)
 	end
-
+	
+	#厳選馬用に出走馬一覧を取り出す
+	#場所とか関係なく、レース分を全部一覧にする
+	def get_list_shussouma
+		temp = Array.new
+		
+		@source.each do |id, shussouma|
+			temp << shussouma
+		end
+		
+		return temp
+	end
+	
 	def test
 		@source.each do |id, shussouma|
 			p shussouma.uma_raceid_no_num
