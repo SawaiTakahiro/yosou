@@ -139,7 +139,6 @@ class Gensen_uma
 	end
 	
 	#win5の処理を差し込む
-	require "./pickup_win5.rb"
 	
 	#厳選馬をブログの記事用にまとめたもの
 	#配列形式でつなげたテキストにして返すので、必要に応じてjoinして使う
