@@ -6,14 +6,6 @@
  厳選馬。win5用のオプション予想。
 =end
 
-require "fileutils"
-require "CSV"
-require "json"
-
-require "./config.rb"
-
-require "./read_csv.rb"
-
 require "date"
 
 #YYYYMMDDという形の数字を日付に変換
@@ -37,5 +29,6 @@ flag_saturday = check_saturday(text)
 
 #土曜日でない = WIN5がある日なら
 if flag_saturday != true then
-	p 
+else
+	p "土曜日だから何もしないよ"
 end

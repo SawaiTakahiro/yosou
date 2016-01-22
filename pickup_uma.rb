@@ -138,6 +138,9 @@ class Gensen_uma
 		return output
 	end
 	
+	#win5の処理を差し込む
+	require "./pickup_win5.rb"
+	
 	#厳選馬をブログの記事用にまとめたもの
 	#配列形式でつなげたテキストにして返すので、必要に応じてjoinして使う
 	def get_blog_gensen_uma(gensen_uma)

@@ -6,7 +6,7 @@
  
  予想自体をクラスにした。
  出馬表クラスを渡されると、予想して買い目を作ったりする。
- =end
+=end
 
 require "fileutils"
 require "CSV"
