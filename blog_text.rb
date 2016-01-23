@@ -97,9 +97,10 @@ class Text_race
 		@blog_text = Array.new
 		
 		name_race = get_name_race(@shutubahyo)
-		@blog_text << "■" + name_race
+		@blog_text << "■" + name_race + "\n"
 		
 		@blog_text << get_text_bunpu_taisen_rank(@taisen_rank).join("\n")
+		@blog_text << "\n"
 		@blog_text << get_text_tanpyo(@taisen_rank).join("\n")
 		@blog_text << get_text_list_umamei(@yosou_umaban, @shutubahyo).join("\n")
 		@blog_text << get_text_kaime_sanrentan_2m(@yosou_umaban).join("\n")
