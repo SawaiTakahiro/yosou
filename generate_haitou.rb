@@ -192,7 +192,7 @@ end
 #三連単が欲しかったりするので、タイプAのものを使っている
 
 #サンプル
-PATH_CSV_SORCE = "./source/sample_haraimodoshi.csv"
+PATH_CSV_SORCE = "./source/201601_haraimodoshi.csv"
 TABLE_SORCE = read_csv(PATH_CSV_SORCE)	#これ自体は書き換えないので定数
 
 =begin

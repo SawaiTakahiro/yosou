@@ -48,7 +48,7 @@ end
 #オーバーライドして適宜、予想の中身をつくれば良いはず？
 #出馬表クラスを受け取ってあれこれする
 class Yosou_template
-	attr_reader :raceid_no_num, :yosou_umaban, :deployment_umaban, :kaime, :error
+	attr_reader :raceid_no_num, :yosou_umaban, :deployment_umaban, :kaime, :error, :list_kaimeid
 	def initialize(data)
 		@error = false	#無効なデータか否か。true : ダメなデータ、false : 問題ないデータ
 		
@@ -79,6 +79,9 @@ class Yosou_template
 		@yosou_umaban = get_yosou_sanrentan(data)
 		@deployment_umaban = get_deployment_umaban_sanrentan_2m(@yosou_umaban)
 		@kaime = get_kaime_target(@raceid_no_num, @deployment_umaban, BAKEN_SANRENTAN)
+		
+		#振り返り用の買い目コードも生成する
+		@list_kaimeid = get_kaime_code(@kaime)
 	end
 	
 	#予想した馬番だけ取得する
@@ -187,6 +190,45 @@ class Yosou_template
 		
 		return temp
 	end
+	
+	#配当形式にするメソッド
+	#引数は、get_list_seisekiとちょっと違う
+	#戻り値も、買い目のidだけ。
+	def get_code_haitou(raceid_no_num, category, umaban_1st, umaban_2nd, umaban_3rd)
+		#馬番を0埋めして持っておく
+		umaban_1st = format("%02d", umaban_1st)
+		umaban_2nd = format("%02d", umaban_2nd)
+		umaban_3rd = format("%02d", umaban_3rd)
+		
+		temp = raceid_no_num + category.to_s + umaban_1st + umaban_2nd + umaban_3rd
+		
+		return temp
+	end
+	
+	#振り返り用の買い目コードを作る
+	def get_kaime_code(kaime)
+		
+		list_kaimeid = Array.new
+		
+		#検証用の買い目を生成する
+		kaime.each do |record|
+			#raceid_no_num = (record[0])[0..18]
+			baken_id = record[2]
+			uma1 = record[3]
+			uma2 = record[4]
+			uma3 = record[5]
+			
+			uma2 = 99 if uma2 == 0	#0が入っていたらダミーの99に変えちゃう
+			uma3 = 99 if uma3 == 0	#0が入っていたらダミーの99に変えちゃう
+			
+			#レースid, 馬券の種類, 馬1〜3まで。馬連は3が不要なので、ダミーの99を入れておく
+			temp = get_code_haitou(raceid_no_num, baken_id, uma1, uma2, uma3)
+			list_kaimeid << temp
+		end
+		
+		return list_kaimeid
+	end
+	
 	
 	def test
 		p self
