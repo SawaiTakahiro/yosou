@@ -10,7 +10,7 @@ require "fileutils"
 require "CSV"
 require "json"
 
-require "readline"	#コピペ用
+#require "readline"	#コピペ用
 
 require "./config.rb"
 
@@ -68,6 +68,32 @@ kaisai.list_basho.each do |key|
 end
 #=end
 
+
+kensho_kaime = Array.new
+
+#検証用の買い目IDを取り出す
+list_raceid = kaisai.list_raceid
+list_raceid.each do |raceid|
+	shutubahyo = kaisai.get_shutubahyo(raceid)
+	
+	yosou = Yosou.new(shutubahyo)
+	kensho_kaime << yosou.list_kaimeid
+end
+
+#これで空白行を削除する
+kensho_kaime.flatten!.compact!.reject(&:empty?)
+
+############################################################
+#puts kensho_kaime
+
+#保存フォルダの用意
+path = "output/kaime/"
+FileUtils.mkdir_p(path) unless FileTest.exist?(path)
+
+save_file = "kaime" + (kensho_kaime[0][2..9]) + ".txt"
+File.open(path + save_file, "w"){|file| file.write kensho_kaime.join("\n")}
+
+
 #=begin
 #厳選馬のテキストを作る
 gensen_uma = Gensen_uma.new(data_csv)
@@ -83,3 +109,4 @@ copy_paste_support(blog_gensen_uma.join)
 p "トラックバックの送信先"
 copy_paste_support(TRACKBACKLIST)
 #=end
+
