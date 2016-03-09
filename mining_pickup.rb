@@ -18,3 +18,22 @@
 		とかかな？
 =end
 
+require "./config.rb"
+require "./read_csv.rb"
+
+
+data_csv = read_csv(PATH_SOURCE_SHUTUBAHYO)
+kaisai = Kaisai.new(data_csv)
+
+list_raceid = kaisai.list_raceid
+hoge = list_raceid[0]
+
+shutubahyo = kaisai.get_shutubahyo(hoge).shutubahyo
+
+list_taisen_yosoku = Array.new
+shutubahyo.map do |shussouma|
+	list_taisen_yosoku << shussouma.uma_taisen_yosoku
+end
+
+puts list_taisen_yosoku
+
