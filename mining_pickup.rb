@@ -76,5 +76,5 @@ list_taisen_yosoku.map do |raceid, taisen_yosoku|
 end
 
 #テスト用表示
-list_hensachi.map{|hoge| p hoge}
+list_hensachi.sort{|a, b| b[2]<=>a[2]}.map{|hoge| p hoge}
 
