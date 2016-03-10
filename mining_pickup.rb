@@ -44,37 +44,43 @@ end
 
 ############################################################
 
+def test(shutubahyo)
+	list_taisen_yosoku = Array.new
+	temp = Array.new
+	shutubahyo.map do |shussouma|
+		raceid = shussouma.uma_raceid
+		taisen_yosoku = shussouma.uma_taisen_yosoku
+		
+		list_taisen_yosoku << [raceid, taisen_yosoku]
+		
+		temp << taisen_yosoku
+	end
+
+	stdev = temp.standard_deviation
+	average = temp.avg
+
+	#偏差値を求めたりして、リストにする
+	list_hensachi = Array.new
+
+	list_taisen_yosoku.map do |raceid, taisen_yosoku|
+		hensachi = ((taisen_yosoku.to_f - average) * 10 / stdev).round(2) + 50
+		
+		list_hensachi << [raceid, taisen_yosoku, hensachi]
+	end
+
+	#テスト用表示
+	list_hensachi.sort{|a, b| b[2]<=>a[2]}.map{|hoge| p hoge}
+end
+
 data_csv = read_csv(PATH_SOURCE_SHUTUBAHYO)
 kaisai = Kaisai.new(data_csv)
 
 list_raceid = kaisai.list_raceid
-hoge = list_raceid[0]
 
-shutubahyo = kaisai.get_shutubahyo(hoge).shutubahyo
-
-list_taisen_yosoku = Array.new
-temp = Array.new
-shutubahyo.map do |shussouma|
-	raceid = shussouma.uma_raceid
-	taisen_yosoku = shussouma.uma_taisen_yosoku
-	
-	list_taisen_yosoku << [raceid, taisen_yosoku]
-	
-	temp << taisen_yosoku
+list_raceid.each do |raceid|
+	shutubahyo = kaisai.get_shutubahyo(raceid).shutubahyo
+	test(shutubahyo)
+	p "-"*10
 end
 
-stdev = temp.standard_deviation
-average = temp.avg
-
-#偏差値を求めたりして、リストにする
-list_hensachi = Array.new
-
-list_taisen_yosoku.map do |raceid, taisen_yosoku|
-	hensachi = ((taisen_yosoku.to_f - average) * 10 / stdev).round(2) + 50
-	
-	list_hensachi << [raceid, taisen_yosoku, hensachi]
-end
-
-#テスト用表示
-list_hensachi.sort{|a, b| b[2]<=>a[2]}.map{|hoge| p hoge}
 
