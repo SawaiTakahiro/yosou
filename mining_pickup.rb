@@ -29,12 +29,12 @@ require "./read_csv.rb"
 class Array
 	# 要素をto_iした値の平均を算出する
 	def avg
-		inject(0.0){|r,i| r+=i.to_i }/size
+		inject(0.0){|r,i| r+=i.to_f }/size
 	end
 	# 要素をto_iした値の分散を算出する
 	def variance
 		a = avg
-		inject(0.0){|r,i| r+=(i.to_i-a)**2 }/size
+		inject(0.0){|r,i| r+=(i.to_f-a)**2 }/size
 	end
 	# 要素をto_iした値の標準偏差を算出する
 	def standard_deviation
@@ -45,6 +45,10 @@ end
 ############################################################
 
 def test(shutubahyo)
+	#対戦型が提供されていないレースだったら、そこで抜ける
+	yosoku = shutubahyo[0].uma_taisen_yosoku
+	return if yosoku == 0
+	
 	list_taisen_yosoku = Array.new
 	temp = Array.new
 	shutubahyo.map do |shussouma|
@@ -81,6 +85,6 @@ list_raceid.each do |raceid|
 	shutubahyo = kaisai.get_shutubahyo(raceid).shutubahyo
 	test(shutubahyo)
 	p "-"*10
+	
 end
-
 
