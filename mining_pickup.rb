@@ -18,6 +18,7 @@
 		とかかな？
 =end
 
+require "CSV"
 require "./config.rb"
 require "./read_csv.rb"
 
@@ -65,26 +66,37 @@ def test(shutubahyo)
 
 	#偏差値を求めたりして、リストにする
 	list_hensachi = Array.new
-
+	
+	output = Array.new
 	list_taisen_yosoku.map do |raceid, taisen_yosoku|
 		hensachi = ((taisen_yosoku.to_f - average) * 10 / stdev).round(2) + 50
-		
 		list_hensachi << [raceid, taisen_yosoku, hensachi]
+		
+		#値が一定以上のものだけ厳選する
+		if hensachi >= 65 then
+			output << [raceid, "A"]
+		elsif hensachi >= 60 then
+			output << [raceid, "B"]
+		end
 	end
 
 	#テスト用表示
-	list_hensachi.sort{|a, b| b[2]<=>a[2]}.map{|hoge| p hoge}
+	#list_hensachi.sort{|a, b| b[2]<=>a[2]}.map{|hoge| p hoge}
+	return output
 end
 
-data_csv = read_csv(PATH_SOURCE_SHUTUBAHYO)
+#data_csv = read_csv(PATH_SOURCE_SHUTUBAHYO)
+data_csv = read_csv("./source/対戦型マイニング予測blog出力用.csv")
 kaisai = Kaisai.new(data_csv)
 
 list_raceid = kaisai.list_raceid
 
+list_gensen = Array.new
 list_raceid.each do |raceid|
 	shutubahyo = kaisai.get_shutubahyo(raceid).shutubahyo
-	test(shutubahyo)
-	p "-"*10
-	
+	data = test(shutubahyo)
+	list_gensen += data if data != nil
 end
 
+#暫定の出力用
+list_gensen.map{|id, rank| print "#{id},#{rank}\n"}
