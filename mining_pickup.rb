@@ -99,4 +99,10 @@ list_raceid.each do |raceid|
 end
 
 #暫定の出力用
-list_gensen.map{|id, rank| print "#{id},#{rank}\n"}
+#list_gensen.map{|id, rank| print "#{id},#{rank}\n"}
+
+CSV.open("piyo.csv", "w") do |csv|
+	list_gensen.each{|row| csv << row}
+end
+
+
